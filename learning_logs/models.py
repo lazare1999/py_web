@@ -26,3 +26,25 @@ class Entry(models.Model):
     def __str__(self):
         """Return a string representation of the model."""
         return self.text[:50] + "..."
+
+
+class CarBrands(models.Model):
+    """A topic the user is learning about"""
+    description = models.CharField(max_length=200)
+    brand_foundation_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """Return a string representation of the model."""
+
+        return self.description
+
+
+class Car(models.Model):
+    """Something specific learned about a topic"""
+    brand = models.ForeignKey(CarBrands, on_delete=models.CASCADE)
+    text = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """Return a string representation of the model."""
+        return self.text[:50] + "..."

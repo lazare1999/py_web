@@ -1,0 +1,9 @@
+{% extends "learning_logs/base.html" %}
+{% block content %}
+<p>Add a new brand:</p>
+<form action="{% url 'learning_logs:new_brand' %}" method='post'>
+   {% csrf_token %}
+  {{ form.as_p }}
+ <button name="submit">add brand</button>
+</form>
+{% endblock content %}

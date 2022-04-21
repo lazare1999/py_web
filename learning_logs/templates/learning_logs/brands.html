@@ -1,0 +1,14 @@
+{% extends "learning_logs/base.html" %}
+{% block content %}
+<p>brands</p>
+ <ul>
+   {% for brand in brands %}
+    <li>
+        <a href="{% url 'learning_logs:brand' brand.id %}">{{ brand }}</a>
+    </li>
+     {% empty %}
+    <li>No brands have been added yet.</li>
+   {% endfor %}
+ </ul>
+    <a href="{% url 'learning_logs:new_brand' %}">Add a new brand:</a>
+{% endblock content %}

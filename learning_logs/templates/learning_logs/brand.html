@@ -1,0 +1,23 @@
+{% extends 'learning_logs/base.html' %}
+{% block content %}
+<p>Brand: {{ brand }}</p>
+<p>Cars:</p>
+    <p>
+        <a href="{% url 'learning_logs:new_car' brand.id %}">add new Car</a>
+      </p>
+  <ul>
+{% for car in cars %}
+  <li>
+    <p>{{ car.date_added|date:'M d, Y H:i' }}</p>
+    <p>{{ car.text|linebreaks }}</p>
+    <p>
+      <a href="{% url 'learning_logs:edit_car' car.id %}">edit car</a>
+    </p>
+  </li>
+   {% empty %}
+  <li>
+   There are no cars for this brand yet.
+  </li>
+{% endfor %}
+</ul>
+{% endblock content %}

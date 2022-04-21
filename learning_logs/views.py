@@ -1,8 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from .forms import TopicForm, EntryForm
-from .models import Topic, Entry
+from .forms import TopicForm, EntryForm, CarBrandForm, CarForm
+from .models import Topic, Entry, CarBrands, Car
 from django.urls import reverse
 
 
@@ -74,3 +74,68 @@ def edit_entry(request, entry_id):
             return HttpResponseRedirect(reverse('learning_logs:topic', args=[t.id]))
     context = {'entry': entry, 'topic': t, 'form': form}
     return render(request, 'learning_logs/edit_entry.html', context)
+
+
+def car_brands(request):
+    """Show all topics."""
+    t = CarBrands.objects.order_by('brand_foundation_date')
+    context = {'brands': t}
+    return render(request, 'learning_logs/brands.html', context)
+
+
+def brand(request, brand_id):
+    """Show a single topic and all its entries."""
+    b = CarBrands.objects.get(id=brand_id)
+    cars = b.car_set.order_by('-date_added')
+    context = {'brand': b, 'cars': cars}
+    return render(request, 'learning_logs/brand.html', context)
+
+
+def new_brand(request):
+    """Add a new brand."""
+    if request.method != 'POST':
+        # No data submitted; create a blank form.
+        form = CarBrandForm()
+    else:
+        # POST data submitted; process data.
+        form = CarBrandForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('learning_logs:car_brands'))
+    context = {'form': form}
+    return render(request, 'learning_logs/new_brand.html', context)
+
+
+def new_car(request, brand_id):
+    """Add a new car for a particular brand."""
+    b = CarBrands.objects.get(id=brand_id)
+    if request.method != 'POST':
+        # No data submitted; create a blank form.
+        form = CarForm()
+    else:
+        # POST data submitted; process data.
+        form = CarForm(data=request.POST)
+        if form.is_valid():
+            new_c = form.save(commit=False)
+            new_c.brand = b
+            new_c.save()
+            return HttpResponseRedirect(reverse('learning_logs:brand', args=[brand_id]))
+    context = {'brand': b, 'form': form}
+    return render(request, 'learning_logs/new_car.html', context)
+
+
+def edit_car(request, car_id):
+    """Edit an existing car."""
+    car = Car.objects.get(id=car_id)
+    b = car.brand
+    if request.method != 'POST':
+        # Initial request; pre-fill form with the current entry.
+        form = CarForm(instance=car)
+    else:
+        # POST data submitted; process data.
+        form = CarForm(instance=car, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('learning_logs:brand', args=[b.id]))
+    context = {'car': car, 'brand': b, 'form': form}
+    return render(request, 'learning_logs/edit_car.html', context)
